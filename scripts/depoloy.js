@@ -3,7 +3,7 @@ const hre = require('hardhat');
 
 async function main() {
   const MoeErc20Wrapped = await hre.ethers.getContractFactory('MoeErc20Wrapped');
-  const moeTokenWrapped = await MoeErc20Wrapped.deploy();
+  const moeTokenWrapped = await MoeErc20Wrapped.deploy(process.env.TOKEN_ADDRESS);
 
   await moeTokenWrapped.deployed();
 
