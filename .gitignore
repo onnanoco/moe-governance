@@ -1,0 +1,7 @@
+.env
+.idea
+.vscode
+artifacts
+cache
+package-lock.json
+node_mudles
