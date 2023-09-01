@@ -3,7 +3,10 @@ const hre = require('hardhat');
 
 async function main() {
   const timelockDelay = 2;
+  const signer = hre.ethers.provider.getSigner();
+  const signerAddress = await signer.getAddress();
 
+  // MoeErc20Wrapped
   const MoeErc20Wrapped = await hre.ethers.getContractFactory('MoeErc20Wrapped');
   const moeTokenWrapped = await MoeErc20Wrapped.deploy(process.env.TOKEN_ADDRESS);
 
@@ -11,15 +14,17 @@ async function main() {
 
   console.log(`Wrapped MOE token contract has been deployed : ${moeTokenWrapped.address}`);
 
+  // MoeTimelock
   const MoeTimelock = await hre.ethers.getContractFactory('MoeTimelock');
-  const moeTimelock = await MoeTimelock.deploy(timelockDelay, hre.ethers.constants.AddressZero, hre.ethers.constants.AddressZero, hre.ethers.constants.AddressZero);
+  const moeTimelock = await MoeTimelock.deploy(timelockDelay, [hre.ethers.constants.AddressZero], [hre.ethers.constants.AddressZero], signerAddress);
 
   await moeTimelock.deployed();
 
   console.log(`MOE timelock contract has been deployed : ${moeTimelock.address}`);
 
+  // MoeGovernor
   const MoeGovernor = await hre.ethers.getContractFactory('MoeGovernor');
-  const moeGovernor = await MoeGovernor.deploy(moeTokenWrapped.addres, moeTimelock.address);
+  const moeGovernor = await MoeGovernor.deploy(moeTokenWrapped.address, moeTimelock.address);
 
   await moeGovernor.deployed();
 
@@ -37,13 +42,6 @@ async function main() {
   await moeTimelock.grantRole(timelockExecuterRole, moeGovernor.address);
   await moeTimelock.grantRole(timelockProposerRole, moeGovernor.address);
   await moeTimelock.grantRole(timelockCancellerRole, moeGovernor.address);
-
-  // Verify
-  await run("verify:verify", {
-    address: moeTimelock.address,
-    constructorArguments: [process.env.TOKEN_ADDRESS],
-  });
-
 
 }
 
