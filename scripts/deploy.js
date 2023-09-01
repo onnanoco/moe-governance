@@ -9,7 +9,14 @@ async function main() {
 
   console.log(`Wrapped MOE token contract has been deployed : ${moeTokenWrapped.address}`);
 
-  const MoeGovernor = await hre.ethers.getContractFactory('MoeGovernor');
+  const MoeTimelock = await hre.ethers.getContractFactory('MoeTimelock');
+  const moeTimelock = await MoeTimelock.deploy(moeTokenWrapped.address);
+
+  await moeTimelock.deployed();
+
+  console.log(`MOE timelock contract has been deployed : ${moeTimelock.address}`);
+
+  const MoeGovernor = await hre.ethers.getContractFactory('MoeGovernor', moeTimelock.address);
   const moeGovernor = await MoeGovernor.deploy();
 
   await moeGovernor.deployed();
