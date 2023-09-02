@@ -2,7 +2,6 @@ require('dotenv').config();
 const hre = require('hardhat');
 
 async function main() {
-  const timelockDelay = 2;
   const signer = hre.ethers.provider.getSigner();
   const signerAddress = await signer.getAddress();
 
@@ -16,7 +15,7 @@ async function main() {
 
   // MoeTimelock
   const MoeTimelock = await hre.ethers.getContractFactory('MoeTimelock');
-  const moeTimelock = await MoeTimelock.deploy(timelockDelay, [hre.ethers.constants.AddressZero], [hre.ethers.constants.AddressZero], signerAddress);
+  const moeTimelock = await MoeTimelock.deploy(process.env.TIMELOCK_DELAY, [hre.ethers.constants.AddressZero], [hre.ethers.constants.AddressZero], signerAddress);
 
   await moeTimelock.deployed();
 
